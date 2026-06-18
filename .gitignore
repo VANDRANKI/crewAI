@@ -1,32 +1,76 @@
-.DS_Store
-.pytest_cache
-__pycache__
+# Python byte-code and packaging
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
 dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.python-version.local
+
+# uv
+.uv/
+
+# Distribution / packaging
+*.tar.gz
+*.whl
+SDIST_FILES
+
+# Test & coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.coveragerc.local
+
+# Type checking
+.mypy_cache/
+.pyright/
+.dmypy.json
+dmypy.json
+
+# Linting
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_metadata
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Local secrets / config
 .env
-assets/*
-.idea
-test/
-docs_crew/
-chroma.sqlite3
-old_en.json
-db/
-test.py
-rc-tests/*
-*.pkl
-temp/*
-.vscode/*
-crew_tasks_output.json
-.codesight
-.mypy_cache
-.ruff_cache
-.venv
-test_flow.html
-crewairules.mdc
-plan.md
-conceptual_plan.md
-build_image
-chromadb-*.lock
-.claude
-.crewai/memory
-blogs/*
-secrets/*
+.env.local
+.env.*.local
+*.secrets
+
+# Docs build
+site/
+_build/
+
+# Generated gRPC / protobuf
+*_pb2.py
+*_pb2_grpc.py
