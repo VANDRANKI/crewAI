@@ -30,3 +30,49 @@ chromadb-*.lock
 .crewai/memory
 blogs/*
 secrets/*
+
+# Python bytecode and cache
+*.pyc
+*.pyo
+*.pyd
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# Distribution / packaging
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env.*
+!.env.example
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Profiling output
+*.prof
+profile_output/
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+*.bak
+*.swp
+*.swo
+*~
+
+# MacOS metadata
+.AppleDouble
+.LSOverride
+
+# JetBrains IDEs
+*.iml
