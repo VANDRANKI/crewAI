@@ -1,7 +1,11 @@
 .DS_Store
 .pytest_cache
-__pycache__
+__pycache__/
+*.pyc
+*.pyo
+*.py[cod]
 dist/
+build/
 .env
 assets/*
 .idea
@@ -17,9 +21,11 @@ temp/*
 .vscode/*
 crew_tasks_output.json
 .codesight
-.mypy_cache
-.ruff_cache
-.venv
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
 test_flow.html
 crewairules.mdc
 plan.md
@@ -30,3 +36,40 @@ chromadb-*.lock
 .crewai/memory
 blogs/*
 secrets/*
+
+# Build artifacts
+*.egg-info/
+*.egg
+MANIFEST
+wheels/
+
+# Coverage and test reports
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+nosetests.xml
+
+# Jupyter
+.ipynb_checkpoints
+
+# Type checkers
+dmypy.json
+.dmypy.json
+.pyre/
+.pytype/
+
+# macOS
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
