@@ -27,26 +27,35 @@ class I18N(BaseModel):
     def load_prompts(self) -> Self:
         """Load prompts from a JSON file.
 
+        Loads from ``prompt_file`` when provided, otherwise falls back to the
+        built-in ``translations/en.json`` file bundled with the package.
+
         Returns:
             The I18N instance with loaded prompts.
 
         Raises:
-            Exception: If the prompt file is not found or cannot be decoded.
+            FileNotFoundError: If the prompt file does not exist on disk.
+            ValueError: If the prompt file exists but contains invalid JSON.
         """
-        try:
-            if self.prompt_file:
-                with open(self.prompt_file, encoding="utf-8") as f:
-                    self._prompts = json.load(f)
-            else:
-                dir_path = os.path.dirname(os.path.realpath(__file__))
-                prompts_path = os.path.join(dir_path, "../translations/en.json")
+        if self.prompt_file:
+            path = self.prompt_file
+        else:
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            path = os.path.join(dir_path, "../translations/en.json")
 
-                with open(prompts_path, encoding="utf-8") as f:
-                    self._prompts = json.load(f)
+        try:
+            with open(path, encoding="utf-8") as f:
+                self._prompts = json.load(f)
         except FileNotFoundError as e:
-            raise Exception(f"Prompt file '{self.prompt_file}' not found.") from e
+            raise FileNotFoundError(
+                f"Prompt file not found: '{path}'. "
+                "Ensure the path is correct and the file exists."
+            ) from e
         except json.JSONDecodeError as e:
-            raise Exception("Error decoding JSON from the prompts file.") from e
+            raise ValueError(
+                f"Failed to decode JSON from prompt file '{path}': {e.msg} "
+                f"(line {e.lineno}, column {e.colno})."
+            ) from e
 
         if not self._prompts:
             self._prompts = {}
@@ -113,33 +122,39 @@ class I18N(BaseModel):
         """Retrieve a prompt by kind and key.
 
         Args:
-            kind: The kind of prompt.
-            key: The key of the specific prompt to retrieve.
+            kind: The category of prompt to look up (e.g. ``"slices"``,
+                ``"errors"``, ``"tools"``).
+            key: The specific prompt key within that category.
 
         Returns:
-            The prompt as a string.
+            The prompt string.
 
         Raises:
-            Exception: If the prompt for the given kind and key is not found.
+            KeyError: If ``kind`` or ``key`` is not present in the loaded
+                prompts, indicating a missing translation entry.
         """
         try:
             return self._prompts[kind][key]
-        except Exception as e:
-            raise Exception(f"Prompt for '{kind}':'{key}'  not found.") from e
+        except KeyError as e:
+            raise KeyError(
+                f"Prompt not found for kind='{kind}', key='{key}'. "
+                "Check that the translation file contains this entry."
+            ) from e
 
 
 @lru_cache(maxsize=None)
 def get_i18n(prompt_file: str | None = None) -> I18N:
-    """Get a cached I18N instance.
+    """Return a cached I18N instance.
 
-    This function caches I18N instances to avoid redundant file I/O and JSON parsing.
-    Each unique prompt_file path gets its own cached instance.
+    Caches I18N instances to avoid redundant file I/O and JSON parsing.
+    Each unique ``prompt_file`` path gets its own cached instance.
 
     Args:
-        prompt_file: Optional custom prompt file path. Defaults to None (uses built-in prompts).
+        prompt_file: Optional custom prompt file path. Defaults to ``None``
+            (uses the built-in ``translations/en.json``).
 
     Returns:
-        Cached I18N instance.
+        Cached I18N instance for the given prompt file.
     """
     return I18N(prompt_file=prompt_file)
 
