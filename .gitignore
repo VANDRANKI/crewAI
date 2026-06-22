@@ -3,30 +3,24 @@
 __pycache__
 dist/
 .env
-assets/*
-.idea
-test/
-docs_crew/
-chroma.sqlite3
-old_en.json
-db/
-test.py
-rc-tests/*
-*.pkl
-temp/*
-.vscode/*
-crew_tasks_output.json
-.codesight
 .mypy_cache
 .ruff_cache
 .venv
-test_flow.html
-crewairules.mdc
-plan.md
-conceptual_plan.md
-build_image
-chromadb-*.lock
+test/
+*.pkl
+.codesight
 .claude
-.crewai/memory
-blogs/*
-secrets/*
+chromadb-*.lock
+
+# Additional environment variable files
+.env.local
+.env.test
+
+# Test and coverage artifacts
+.hypothesis/
+.coverage.*
+htmlcov/
+
+# Python build artifacts
+*.egg-info/
+*.pyc
