@@ -1100,10 +1100,34 @@ class Agent(BaseAgent):
             )
 
     def get_delegation_tools(self, agents: Sequence[BaseAgent]) -> list[BaseTool]:
+        """Return delegation tools that allow this agent to delegate tasks to others.
+
+        Wraps each agent in the given sequence as a delegatable tool so that
+        this agent can hand off work to peers during task execution.
+
+        Args:
+            agents: Sequence of agents that can receive delegated tasks.
+
+        Returns:
+            List of BaseTool instances wrapping each agent for delegation.
+        """
         agent_tools = AgentTools(agents=agents)
         return agent_tools.tools()
 
     def get_platform_tools(self, apps: list[PlatformAppOrAction]) -> list[BaseTool]:
+        """Return CrewAI Platform tools for the given app references.
+
+        Attempts to import and initialize CrewaiPlatformTools. If the import
+        fails (e.g. crewai_tools is not installed), logs the error and returns
+        an empty list rather than raising.
+
+        Args:
+            apps: List of platform app or action references to wrap as tools.
+
+        Returns:
+            List of BaseTool instances for the requested platform apps, or an
+            empty list if crewai_tools is unavailable.
+        """
         try:
             from crewai_tools import (
                 CrewaiPlatformTools,
