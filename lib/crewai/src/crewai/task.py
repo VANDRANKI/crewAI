@@ -560,12 +560,30 @@ class Task(BaseModel):
         context: str | None = None,
         tools: list[BaseTool] | None = None,
     ) -> TaskOutput:
-        """Execute the task synchronously."""
+        """Execute the task synchronously.
+
+        Args:
+            agent: Agent to execute the task. Falls back to self.agent if not provided.
+            context: Optional context string to pass to the agent during execution.
+            tools: Optional list of tools to override the task's default tools.
+
+        Returns:
+            TaskOutput containing the result of the task execution.
+        """
         self.start_time = datetime.datetime.now()
         return self._execute_core(agent, context, tools)
 
     @property
     def key(self) -> str:
+        """Compute a stable cache key for this task based on its description and expected output.
+
+        The key is derived from an MD5 hash of the original (pre-interpolation) description
+        and expected output joined with a pipe separator. This allows consistent task
+        identification across crew runs even when inputs are interpolated.
+
+        Returns:
+            Hex digest string suitable for use as a cache or checkpoint key.
+        """
         description = self._original_description or self.description
         expected_output = self._original_expected_output or self.expected_output
         source = [description, expected_output]
@@ -574,6 +592,15 @@ class Task(BaseModel):
 
     @property
     def execution_duration(self) -> float | None:
+        """Return the wall-clock duration of the last task execution in seconds.
+
+        Computed from start_time and end_time, both of which are set by execute_sync
+        and execute_async. Returns None if either timestamp is missing (i.e. the task
+        has not yet started or not yet finished).
+
+        Returns:
+            Duration in seconds as a float, or None if timing data is incomplete.
+        """
         if not self.start_time or not self.end_time:
             return None
         return (self.end_time - self.start_time).total_seconds()
@@ -584,7 +611,20 @@ class Task(BaseModel):
         context: str | None = None,
         tools: list[BaseTool] | None = None,
     ) -> Future[TaskOutput]:
-        """Execute the task asynchronously."""
+        """Execute the task asynchronously in a background daemon thread.
+
+        Spawns a daemon thread that runs _execute_core and stores the result (or
+        exception) in the returned Future. The caller can block on Future.result()
+        or register a done callback without blocking the main thread.
+
+        Args:
+            agent: Agent to execute the task. Falls back to self.agent if not provided.
+            context: Optional context string to pass to the agent during execution.
+            tools: Optional list of tools to override the task's default tools.
+
+        Returns:
+            Future that resolves to the TaskOutput when execution completes.
+        """
         future: Future[TaskOutput] = Future()
         ctx = contextvars.copy_context()
         threading.Thread(
@@ -865,6 +905,15 @@ class Task(BaseModel):
             reset_current_task_id(task_id_token)
 
     def _post_agent_execution(self, agent: BaseAgent) -> None:
+        """Hook called immediately after the agent finishes executing the task.
+
+        Subclasses can override this method to perform post-processing on the
+        agent or task state (e.g. recording metrics, updating external systems)
+        before output formatting and guardrail evaluation begin.
+
+        Args:
+            agent: The agent that just finished executing the task.
+        """
         pass
 
     def prompt(self) -> str:
@@ -1096,6 +1145,19 @@ Follow these guidelines:
     def _export_output(
         self, result: str
     ) -> tuple[BaseModel | None, dict[str, Any] | None]:
+        """Convert raw agent output to structured Pydantic or JSON format.
+
+        Attempts to parse the string result into output_pydantic or output_json
+        using the configured converter. If no output type is configured, both
+        return values will be None.
+
+        Args:
+            result: Raw string output from the agent.
+
+        Returns:
+            Tuple of (pydantic_output, json_output). Exactly one will be non-None
+            when an output type is configured; both are None for raw output.
+        """
         pydantic_output: BaseModel | None = None
         json_output: dict[str, Any] | None = None
 
@@ -1121,6 +1183,15 @@ Follow these guidelines:
         return pydantic_output, json_output
 
     def _get_output_format(self) -> OutputFormat:
+        """Determine the output format enum value based on configured output type fields.
+
+        Checks output_json and output_pydantic in that order. If neither is set,
+        defaults to RAW output.
+
+        Returns:
+            OutputFormat.JSON if output_json is set, OutputFormat.PYDANTIC if
+            output_pydantic is set, otherwise OutputFormat.RAW.
+        """
         if self.output_json:
             return OutputFormat.JSON
         if self.output_pydantic:
@@ -1206,6 +1277,27 @@ Follow these guidelines:
         guardrail: GuardrailCallable | None,
         guardrail_index: int | None = None,
     ) -> TaskOutput:
+        """Invoke the guardrail function synchronously with retry logic.
+
+        Runs the guardrail against the current task output and, if it fails,
+        re-executes the agent with a corrective context message up to
+        guardrail_max_retries times. Raises if the maximum retry count is
+        exhausted without a passing guardrail result.
+
+        Args:
+            task_output: The TaskOutput to validate.
+            agent: The agent that produced the output and will retry if needed.
+            tools: Tools available to the agent for retry executions.
+            guardrail: The callable guardrail to apply. No-ops if None.
+            guardrail_index: Index of this guardrail in the guardrails list,
+                used for per-guardrail retry tracking. None for single guardrail.
+
+        Returns:
+            The (possibly updated) TaskOutput after the guardrail passes.
+
+        Raises:
+            Exception: If the guardrail fails after guardrail_max_retries retries.
+        """
         if not guardrail:
             return task_output
 
