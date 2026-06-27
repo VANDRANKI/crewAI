@@ -88,6 +88,7 @@ intelligent automations.
 - [Getting Started](#getting-started)
 - [Key Features](#key-features)
 - [Understanding Flows and Crews](#understanding-flows-and-crews)
+- [Agent Configuration Tips](#agent-configuration-tips)
 - [CrewAI vs LangGraph](#how-crewai-compares)
 - [Examples](#examples)
   - [Quick Tutorial](#quick-tutorial)
@@ -115,7 +116,7 @@ Using an AI coding agent? Teach it CrewAI best practices in one command:
 Four skills that activate automatically when you ask relevant CrewAI questions:
 
 | Skill | When it runs |
-|-------|--------------|
+|-------|-------------- |
 | `getting-started` | Scaffolding new projects, choosing between `LLM.call()` / `Agent` / `Crew` / `Flow`, wiring `crew.py` / `main.py` |
 | `design-agent` | Configuring agents — role, goal, backstory, tools, LLMs, memory, guardrails |
 | `design-task` | Writing task descriptions, dependencies, structured output (`output_pydantic`, `output_json`), human review |
@@ -430,6 +431,109 @@ crewai update
 You should see the output in the console and the `report.md` file should be created in the root of your project with the full final report.
 
 In addition to the sequential process, you can use the hierarchical process, which automatically assigns a manager to the defined crew to properly coordinate the planning and execution of tasks through delegation and validation of results. [See more about the processes here](https://docs.crewai.com/core-concepts/Processes/).
+
+## Agent Configuration Tips
+
+Configuring agents effectively is key to getting reliable, high-quality results from your CrewAI crews. This section covers the most impactful settings and common pitfalls.
+
+### Essential Agent Parameters
+
+| Parameter | Type | Description | Recommendation |
+|-----------|------|-------------|----------------|
+| `role` | `str` | The agent's job title and area of expertise | Be specific — "Senior Python Engineer" outperforms "Developer" |
+| `goal` | `str` | What the agent is trying to accomplish | State the desired outcome, not the method |
+| `backstory` | `str` | The agent's persona and relevant experience | Include domain knowledge and communication style |
+| `llm` | `LLM` | The language model powering this agent | Defaults to OpenAI; override per agent as needed |
+| `tools` | `list` | External capabilities the agent can invoke | Only provide tools the agent's role actually needs |
+| `max_iter` | `int` | Maximum reasoning iterations before giving up | Default is 20; lower for deterministic tasks |
+| `memory` | `bool` | Whether the agent retains inter-task context | Enable for long-running workflows; disable for stateless tasks |
+| `verbose` | `bool` | Log the agent's internal reasoning steps | Set `True` during development; `False` in production |
+| `allow_delegation` | `bool` | Let the agent hand tasks to other crew members | Only enable in hierarchical process crews |
+
+### Crafting Effective Role / Goal / Backstory Triples
+
+The single biggest lever on output quality is the role/goal/backstory triple. Think of it as a system prompt for that specific agent.
+
+```python
+# Too vague — produces generic, shallow output
+Agent(
+    role="Analyst",
+    goal="Analyze data",
+    backstory="You analyze things.",
+)
+
+# Specific — produces focused, actionable output
+Agent(
+    role="Financial Risk Analyst",
+    goal=(
+        "Identify liquidity and credit risks in the provided balance sheet "
+        "and produce a concise risk summary with severity ratings."
+    ),
+    backstory=(
+        "You are a CFA charterholder with 15 years of experience in bank "
+        "stress testing. You communicate findings in plain language suitable "
+        "for a non-technical executive audience."
+    ),
+)
+```
+
+### Using a Non-Default LLM for a Single Agent
+
+You can mix models within the same crew — for example, use a cheaper model for routine tasks and a more capable model for complex reasoning:
+
+```python
+from crewai import Agent, LLM
+
+# Fast, cost-efficient agent for simple summarisation
+summariser = Agent(
+    role="Content Summariser",
+    goal="Condense long documents into 3-bullet executive summaries",
+    backstory="You are a skilled technical writer.",
+    llm=LLM(model="gpt-4o-mini"),
+)
+
+# More capable agent for nuanced legal analysis
+legal_analyst = Agent(
+    role="Legal Analyst",
+    goal="Identify contractual risk clauses and suggest mitigations",
+    backstory="You are a senior in-house counsel with M&A experience.",
+    llm=LLM(model="gpt-4o"),
+)
+```
+
+### Controlling Tool Access
+
+Give each agent only the tools relevant to its role. Unnecessary tools increase prompt length and can confuse the agent into using the wrong tool:
+
+```python
+from crewai_tools import SerperDevTool, FileReadTool, CodeInterpreterTool
+
+# Researcher only needs web search
+researcher = Agent(
+    role="Research Specialist",
+    goal="Find the latest published benchmarks for vector database performance",
+    backstory="You are an expert at finding authoritative technical sources.",
+    tools=[SerperDevTool()],
+)
+
+# Engineer only needs code execution and file I/O
+engineer = Agent(
+    role="Benchmark Engineer",
+    goal="Run the provided benchmark script and return structured results",
+    backstory="You write clean, reproducible Python benchmarks.",
+    tools=[FileReadTool(), CodeInterpreterTool()],
+)
+```
+
+### Production Checklist for Agents
+
+Before deploying a crew to production:
+
+- [ ] Set `max_iter` explicitly — the default (20) may be too high for time-sensitive workflows.
+- [ ] Set `verbose=False` to avoid logging sensitive data to stdout.
+- [ ] Set `allow_delegation=False` unless you are using `Process.hierarchical` and explicitly want agent-to-agent hand-offs.
+- [ ] Validate that every agent has an `expected_output`-bearing task so the crew always terminates.
+- [ ] Test with `process=Process.sequential` first; switch to `hierarchical` only when you need a manager agent.
 
 ## Key Features
 
