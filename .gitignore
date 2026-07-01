@@ -19,6 +19,9 @@ crew_tasks_output.json
 .codesight
 .mypy_cache
 .ruff_cache
+.coverage
+*.egg-info/
+.eggs/
 .venv
 test_flow.html
 crewairules.mdc
