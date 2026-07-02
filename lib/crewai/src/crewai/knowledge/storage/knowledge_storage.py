@@ -63,6 +63,17 @@ class KnowledgeStorage(BaseKnowledgeStorage):
         metadata_filter: dict[str, Any] | None = None,
         score_threshold: float = 0.6,
     ) -> list[SearchResult]:
+        """Search for documents in the knowledge base.
+
+        Args:
+            query: List of query strings.
+            limit: Maximum number of results to return.
+            metadata_filter: Optional metadata filter for the search.
+            score_threshold: Minimum similarity score for results.
+
+        Returns:
+            List of search results.
+        """
         try:
             if not query:
                 raise ValueError("Query cannot be empty")
@@ -89,6 +100,7 @@ class KnowledgeStorage(BaseKnowledgeStorage):
             return []
 
     def reset(self) -> None:
+        """Reset the knowledge base by deleting its collection."""
         try:
             client = self._get_client()
             collection_name = (
@@ -103,6 +115,11 @@ class KnowledgeStorage(BaseKnowledgeStorage):
             )
 
     def save(self, documents: list[str]) -> None:
+        """Save documents to the knowledge base.
+
+        Args:
+            documents: List of document strings to save.
+        """
         if not documents:
             return
 
