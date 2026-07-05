@@ -711,4 +711,7 @@ def tool(
             return _make_with_name(f.__name__)(f)
 
         return decorator
-    raise ValueError("Invalid arguments")
+    raise ValueError(
+        f"Invalid arguments to @tool decorator: expected zero arguments, a single "
+        f"callable, or a single string name, but got {len(args)} positional arguments."
+    )
