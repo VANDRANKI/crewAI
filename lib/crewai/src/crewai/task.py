@@ -566,6 +566,11 @@ class Task(BaseModel):
 
     @property
     def key(self) -> str:
+        """Return a stable identifier derived from the task's description and expected output.
+
+        Returns:
+            A hex digest that uniquely identifies this task's content, suitable for caching.
+        """
         description = self._original_description or self.description
         expected_output = self._original_expected_output or self.expected_output
         source = [description, expected_output]
