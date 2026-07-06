@@ -180,5 +180,3 @@ class PickleHandler:
                     return pickle.load(file)  # noqa: S301
                 except EOFError:
                     return {}
-                except Exception:
-                    raise
