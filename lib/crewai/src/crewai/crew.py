@@ -788,6 +788,15 @@ class Crew(FlowTrackable, BaseModel):
 
     @property
     def key(self) -> str:
+        """Get a stable identity key for this crew.
+
+        The key is an MD5 digest computed from the keys of every agent and
+        task in the crew, so two crews with the same agents and tasks (in
+        the same order) produce the same key.
+
+        Returns:
+            The hex-encoded MD5 digest identifying this crew's composition.
+        """
         source: list[str] = [agent.key for agent in self.agents] + [
             task.key for task in self.tasks
         ]
