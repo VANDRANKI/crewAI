@@ -1,3 +1,9 @@
+"""Utilities for detecting the coding-agent environment CrewAI runs in.
+
+Emits a one-time telemetry event identifying whether CrewAI is running under
+Claude Code, Codex, Cursor, or a default (unrecognized) environment.
+"""
+
 import contextvars
 import os
 
@@ -17,14 +23,22 @@ _env_context_emitted: contextvars.ContextVar[bool] = contextvars.ContextVar(
 
 
 def _is_codex_env() -> bool:
+    """Returns True if any Codex-specific environment variable is set."""
     return any(os.environ.get(var) for var in CODEX_ENV_VARS)
 
 
 def _is_cursor_env() -> bool:
+    """Returns True if any Cursor-specific environment variable is set."""
     return any(os.environ.get(var) for var in CURSOR_ENV_VARS)
 
 
 def get_env_context() -> None:
+    """Emit a single telemetry event identifying the current coding-agent environment.
+
+    Checks, in order, for Claude Code, Codex, and Cursor environment
+    variables, falling back to a default event when none match. The event
+    is only emitted once per context (tracked via `_env_context_emitted`).
+    """
     if _env_context_emitted.get():
         return
     _env_context_emitted.set(True)
