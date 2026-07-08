@@ -149,6 +149,16 @@ class DaytonaFileTool(DaytonaBaseTool):
         try:
             existing: bytes = sandbox.fs.download_file(path)
         except Exception:
+            # Best-effort: treat a failed download as "file does not exist yet"
+            # so append behaves like create-then-append. Any other failure
+            # (e.g. permissions, transient network error) is still surfaced
+            # here for diagnosability instead of silently vanishing.
+            logger.debug(
+                "Failed to download existing file %s before append; "
+                "treating as empty and creating a new file.",
+                path,
+                exc_info=True,
+            )
             existing = b""
         payload = existing + chunk
         sandbox.fs.upload_file(payload, path)
