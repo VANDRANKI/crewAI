@@ -344,11 +344,7 @@ class SingleStoreSearchTool(BaseTool):
         Raises:
             Exception: If connection cannot be established
         """
-        try:
-            return self.connection_pool.connect()  # type: ignore[union-attr]
-        except Exception:
-            # Re-raise the exception to be handled by the caller
-            raise
+        return self.connection_pool.connect()  # type: ignore[union-attr]
 
     def _create_connection(self) -> Any:
         """Create a new SingleStore connection.
@@ -362,11 +358,7 @@ class SingleStoreSearchTool(BaseTool):
         Raises:
             Exception: If connection cannot be created
         """
-        try:
-            return connect(**self.connection_args)
-        except Exception:
-            # Re-raise the exception to be handled by the caller
-            raise
+        return connect(**self.connection_args)
 
     def _validate_query(self, search_query: str) -> tuple[bool, str]:
         """Validate the search query to ensure it's safe to execute.
