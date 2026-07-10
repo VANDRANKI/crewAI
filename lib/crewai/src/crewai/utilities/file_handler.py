@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import logging
 import os
 import pickle
 from typing import Any, TypedDict
@@ -7,6 +8,8 @@ from typing import Any, TypedDict
 from typing_extensions import Unpack
 
 from crewai.utilities.lock_store import lock as store_lock
+
+logger = logging.getLogger(__name__)
 
 
 class LogEntry(TypedDict, total=False):
@@ -181,4 +184,7 @@ class PickleHandler:
                 except EOFError:
                     return {}
                 except Exception:
+                    logger.exception(
+                        "Failed to load pickled data from %s", self.file_path
+                    )
                     raise
