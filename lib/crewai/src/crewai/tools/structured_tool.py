@@ -273,17 +273,12 @@ class CrewStructuredTool(BaseModel):
 
         self._increment_usage_count()
 
-        try:
-            if inspect.iscoroutinefunction(self.func):
-                return await self.func(**parsed_args, **kwargs)
-            # Run sync functions in a thread pool
-            import asyncio
-
-            return await asyncio.get_event_loop().run_in_executor(
-                None, lambda: self.func(**parsed_args, **kwargs)
-            )
-        except Exception:
-            raise
+        if inspect.iscoroutinefunction(self.func):
+            return await self.func(**parsed_args, **kwargs)
+        # Run sync functions in a thread pool
+        return await asyncio.get_event_loop().run_in_executor(
+            None, lambda: self.func(**parsed_args, **kwargs)
+        )
 
     def _run(self, *args: Any, **kwargs: Any) -> Any:
         """Legacy method for compatibility."""
