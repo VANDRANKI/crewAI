@@ -25,6 +25,13 @@ def _is_cursor_env() -> bool:
 
 
 def get_env_context() -> None:
+    """Detect the current execution environment and emit a matching event.
+
+    Checks for Claude Code, Codex, and Cursor environment variables (in that
+    order) and emits the corresponding event on the crewai event bus, falling
+    back to `DefaultEnvEvent` if none match. Emits at most once per context,
+    tracked via `_env_context_emitted`.
+    """
     if _env_context_emitted.get():
         return
     _env_context_emitted.set(True)
