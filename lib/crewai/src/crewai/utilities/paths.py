@@ -10,7 +10,10 @@ def db_storage_path() -> str:
     """Returns the path for SQLite database storage.
 
     Returns:
-        str: Full path to the SQLite database file
+        str: Full path to the directory used for SQLite database storage.
+            The directory is created if it does not already exist. Callers
+            join the database filename onto this path (e.g. via
+            ``Path(db_storage_path()) / "flow_states.db"``).
     """
     app_name = get_project_directory_name()
     app_author = "CrewAI"
