@@ -19,7 +19,12 @@ def create_llm(
         llm_value: LLM instance, model name string, None, or an object with LLM attributes.
 
     Returns:
-        A BaseLLM instance if successful, or None if something fails.
+        A BaseLLM instance.
+
+    Raises:
+        Exception: Re-raises whatever exception was thrown while instantiating
+            the LLM (e.g. from an invalid model string or object attributes),
+            after logging it.
     """
 
     if isinstance(llm_value, (LLM, BaseLLM)):
@@ -77,7 +82,12 @@ def _llm_via_environment_or_fallback() -> LLM | None:
     """Creates an LLM instance based on environment variables or defaults.
 
     Returns:
-        A BaseLLM instance if successful, or None if something fails.
+        A BaseLLM instance.
+
+    Raises:
+        Exception: Re-raises whatever exception was thrown while instantiating
+            the LLM from the resolved environment/fallback parameters, after
+            logging it.
     """
     model_name = (
         os.environ.get("MODEL")
