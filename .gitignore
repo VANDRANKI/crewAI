@@ -20,6 +20,9 @@ crew_tasks_output.json
 .mypy_cache
 .ruff_cache
 .venv
+*.egg-info/
+.coverage
+htmlcov/
 test_flow.html
 crewairules.mdc
 plan.md
