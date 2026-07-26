@@ -150,9 +150,7 @@ Setup and run your first CrewAI agents by following this tutorial.
 
 [![CrewAI Getting Started Tutorial](https://img.youtube.com/vi/-kSOTtYzgEw/hqdefault.jpg)](https://www.youtube.com/watch?v=-kSOTtYzgEw "CrewAI Getting Started Tutorial")
 
-###
-
-Learning Resources
+### Learning Resources
 
 Learn CrewAI through our comprehensive courses:
 
