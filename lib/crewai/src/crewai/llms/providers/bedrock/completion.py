@@ -677,7 +677,10 @@ class BedrockCompletion(BaseLLM):
                     or "role" not in msg
                     or "content" not in msg
                 ):
-                    raise ValueError(f"Invalid message format at index {i}")
+                    raise ValueError(
+                        f"Invalid message format at index {i}: expected a dict "
+                        f"with 'role' and 'content' keys, got {msg!r}"
+                    )
 
             # Call Bedrock Converse API with proper error handling
             response = self._get_sync_client().converse(
@@ -1274,7 +1277,10 @@ class BedrockCompletion(BaseLLM):
                     or "role" not in msg
                     or "content" not in msg
                 ):
-                    raise ValueError(f"Invalid message format at index {i}")
+                    raise ValueError(
+                        f"Invalid message format at index {i}: expected a dict "
+                        f"with 'role' and 'content' keys, got {msg!r}"
+                    )
 
             async_client = await self._ensure_async_client()
             response = await async_client.converse(
