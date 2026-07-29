@@ -1,3 +1,11 @@
+"""File-based handlers for structured logging and pickle persistence.
+
+Provides FileHandler for writing structured log entries to JSON or plain
+text files, and PickleHandler for saving/loading arbitrary Python objects
+to disk via pickle. Both use a lock keyed on the resolved file path to
+guard against concurrent writers.
+"""
+
 from datetime import datetime
 import json
 import os
