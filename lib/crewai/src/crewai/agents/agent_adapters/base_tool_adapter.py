@@ -18,7 +18,13 @@ class BaseToolAdapter(ABC):
     different frameworks and platforms.
     """
 
-    def __init__(self, tools: list[BaseTool] | None = None):
+    def __init__(self, tools: list[BaseTool] | None = None) -> None:
+        """Initialize the adapter with the tools to be converted.
+
+        Args:
+            tools: Optional list of BaseTool instances to adapt. Defaults to
+                an empty list when not provided.
+        """
         self.original_tools = tools or []
         self.converted_tools: list[Any] = []
 

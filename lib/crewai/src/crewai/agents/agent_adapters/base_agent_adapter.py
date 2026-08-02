@@ -25,7 +25,15 @@ class BaseAgentAdapter(BaseAgent, ABC):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def __init__(self, agent_config: dict[str, Any] | None = None, **kwargs: Any):
+    def __init__(
+        self, agent_config: dict[str, Any] | None = None, **kwargs: Any
+    ) -> None:
+        """Initialize the agent adapter.
+
+        Args:
+            agent_config: Optional adapter-specific configuration dictionary.
+            **kwargs: Additional keyword arguments forwarded to BaseAgent.
+        """
         super().__init__(adapted_agent=True, **kwargs)
         self._agent_config = agent_config
 
