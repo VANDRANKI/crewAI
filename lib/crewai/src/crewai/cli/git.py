@@ -3,7 +3,23 @@ import subprocess
 
 
 class Repository:
+    """Wrapper around common Git operations for a local repository.
+
+    Attributes:
+        path: Filesystem path to the Git repository.
+    """
+
     def __init__(self, path: str = ".") -> None:
+        """Initialize the repository wrapper and fetch the latest remote state.
+
+        Args:
+            path: Filesystem path to the Git repository. Defaults to the
+                current directory.
+
+        Raises:
+            ValueError: If Git is not installed, or if ``path`` is not a
+                Git repository.
+        """
         self.path = path
 
         if not self.is_git_installed():
