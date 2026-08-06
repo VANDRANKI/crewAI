@@ -494,6 +494,14 @@ class LanceDBStorage:
         return records[offset : offset + limit]
 
     def get_scope_info(self, scope: str) -> ScopeInfo:
+        """Get information about a scope.
+
+        Args:
+            scope: The scope path.
+
+        Returns:
+            ScopeInfo with record count, categories, date range, child scopes.
+        """
         scope = scope.rstrip("/") or "/"
         prefix = scope if scope != "/" else ""
         if prefix and not prefix.startswith("/"):
