@@ -192,11 +192,12 @@ def get_uploader(
             not os.environ.get("CREWAI_BEDROCK_S3_BUCKET")
             and "bucket_name" not in kwargs
         ):
-            logger.debug(
+            msg = (
                 "Bedrock S3 uploader not configured. "
                 "Set CREWAI_BEDROCK_S3_BUCKET environment variable to enable."
             )
-            raise
+            logger.debug(msg)
+            raise ValueError(msg)
         try:
             from crewai_files.uploaders.bedrock import BedrockFileUploader
 
@@ -212,5 +213,6 @@ def get_uploader(
             logger.warning("boto3 not installed. Install with: pip install boto3")
             raise
 
-    logger.debug(f"No file uploader available for provider: {provider}")
-    raise
+    msg = f"No file uploader available for provider: {provider}"
+    logger.debug(msg)
+    raise ValueError(msg)
