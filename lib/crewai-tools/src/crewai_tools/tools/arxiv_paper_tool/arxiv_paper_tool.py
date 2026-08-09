@@ -78,6 +78,19 @@ class ArxivPaperTool(BaseTool):
     def fetch_arxiv_data(
         self, search_query: str, max_results: int
     ) -> list[dict[str, Any]]:
+        """Fetch paper metadata from the Arxiv API for a search query.
+
+        Args:
+            search_query: Search query for Arxiv, e.g., 'transformer neural network'.
+            max_results: Maximum number of results to fetch.
+
+        Returns:
+            List of dictionaries with keys: arxiv_id, title, summary, authors,
+            published_date, and pdf_url.
+
+        Raises:
+            urllib.error.URLError: If the request to the Arxiv API fails.
+        """
         api_url = f"{self.BASE_API_URL}?search_query={urllib.parse.quote(search_query)}&start=0&max_results={max_results}"
         logger.info(f"Fetching data from Arxiv API: {api_url}")
 
@@ -159,6 +172,16 @@ class ArxivPaperTool(BaseTool):
         return save_path
 
     def download_pdf(self, pdf_url: str, save_path: str) -> None:
+        """Download a PDF from Arxiv and save it to disk.
+
+        Args:
+            pdf_url: Direct URL to the PDF file on Arxiv.
+            save_path: Destination path where the PDF should be written.
+
+        Raises:
+            urllib.error.URLError: If the download request fails.
+            OSError: If the file cannot be written to save_path.
+        """
         try:
             logger.info(f"Downloading PDF from {pdf_url} to {save_path}")
             urllib.request.urlretrieve(pdf_url, str(save_path))  # noqa: S310
