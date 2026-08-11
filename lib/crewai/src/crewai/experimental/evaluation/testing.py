@@ -13,6 +13,17 @@ from crewai.experimental.evaluation.experiment import (
 def assert_experiment_successfully(
     experiment_results: ExperimentResults, baseline_filepath: str | None = None
 ) -> None:
+    """Assert that an experiment run passed and shows no regression vs. baseline.
+
+    Args:
+        experiment_results: Results produced by running an `ExperimentRunner`.
+        baseline_filepath: Path to a baseline results file to compare against.
+            Defaults to a filename derived from the calling test function.
+
+    Raises:
+        AssertionError: If any test case failed, or if the comparison against
+            the baseline detects a regression.
+    """
     failed_tests = [
         result for result in experiment_results.results if not result.passed
     ]
@@ -38,6 +49,15 @@ def assert_experiment_successfully(
 
 
 def assert_experiment_no_regression(comparison_result: dict[str, list[str]]) -> None:
+    """Assert that a baseline comparison shows no regressed test cases.
+
+    Args:
+        comparison_result: Mapping produced by `ExperimentResults.compare_with_baseline`,
+            expected to contain optional `"regressed"` and `"missing_tests"` keys.
+
+    Raises:
+        AssertionError: If any previously-passing tests regressed.
+    """
     regressed = comparison_result.get("regressed", [])
     if regressed:
         raise AssertionError(
@@ -59,6 +79,18 @@ def run_experiment(
     agents: list[Agent] | None = None,
     verbose: bool = False,
 ) -> ExperimentResults:
+    """Run an evaluation experiment over a dataset with a crew or set of agents.
+
+    Args:
+        dataset: List of evaluation cases to run.
+        crew: Crew to evaluate. Mutually exclusive usage is up to the runner;
+            either `crew` or `agents` is typically provided.
+        agents: Agents to evaluate directly, without a crew.
+        verbose: Whether to print a summary of the experiment results.
+
+    Returns:
+        The results of running the experiment.
+    """
     runner = ExperimentRunner(dataset=dataset)
 
     return runner.run(agents=agents, crew=crew, print_summary=verbose)
