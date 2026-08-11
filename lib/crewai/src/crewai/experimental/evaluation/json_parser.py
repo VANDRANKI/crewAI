@@ -6,6 +6,22 @@ from typing import Any
 
 
 def extract_json_from_llm_response(text: str) -> dict[str, Any]:
+    """Extract a JSON object from a raw LLM response.
+
+    Tries direct JSON parsing first, then falls back to scanning for
+    markdown code blocks (with or without a ``json`` language tag) and
+    inline code spans containing a JSON object or array.
+
+    Args:
+        text: Raw text returned by the LLM, which may wrap JSON in
+            markdown formatting or contain surrounding prose.
+
+    Returns:
+        The parsed JSON object.
+
+    Raises:
+        ValueError: If no valid JSON could be found in the response.
+    """
     try:
         result: dict[str, Any] = json.loads(text)
         return result

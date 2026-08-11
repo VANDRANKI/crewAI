@@ -25,6 +25,11 @@ def _is_cursor_env() -> bool:
 
 
 def get_env_context() -> None:
+    """Detect the current execution environment and emit a matching event.
+
+    Emits exactly one environment event per context (CC, Codex, Cursor, or
+    default) on first call; subsequent calls in the same context are no-ops.
+    """
     if _env_context_emitted.get():
         return
     _env_context_emitted.set(True)
