@@ -25,6 +25,13 @@ def _is_cursor_env() -> bool:
 
 
 def get_env_context() -> None:
+    """Emit an environment context event identifying the current coding agent.
+
+    Detects whether execution is happening inside Claude Code, Codex, Cursor,
+    or a generic environment (checked in that order) and emits the matching
+    event on the crewai event bus. The event is emitted at most once per
+    context, tracked via a context-local flag.
+    """
     if _env_context_emitted.get():
         return
     _env_context_emitted.set(True)

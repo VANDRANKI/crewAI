@@ -15,6 +15,15 @@ class StandardPromptResult(BaseModel):
     prompt: str = Field(default="")
 
     def get(self, key: str, default: Any = None) -> Any:
+        """Retrieve a field value by name, dict-style.
+
+        Args:
+            key: Name of the field to retrieve.
+            default: Value to return if the field does not exist.
+
+        Returns:
+            The field value, or `default` if the field is not present.
+        """
         return getattr(self, key, default)
 
     def __getitem__(self, key: str) -> Any:
