@@ -30,3 +30,9 @@ chromadb-*.lock
 .crewai/memory
 blogs/*
 secrets/*
+*.egg-info/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.env.local
