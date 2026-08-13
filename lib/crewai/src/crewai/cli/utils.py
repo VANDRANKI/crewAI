@@ -357,6 +357,19 @@ def get_crews(crew_path: str = "crew.py", require: bool = False) -> list[Crew]:
 
 
 def get_crew_instance(module_attr: Any) -> Crew | None:
+    """Check if a module attribute resolves to a Crew instance.
+
+    Handles three cases: a class decorated as a crew (exposing
+    ``is_crew_class``), a callable annotated to return a ``Crew``, and an
+    attribute that is already a ``Crew`` instance.
+
+    Args:
+        module_attr: An attribute from a loaded module.
+
+    Returns:
+        A Crew instance if one could be resolved from the attribute,
+        None otherwise.
+    """
     if (
         callable(module_attr)
         and hasattr(module_attr, "is_crew_class")
@@ -377,6 +390,18 @@ def get_crew_instance(module_attr: Any) -> Crew | None:
 
 
 def fetch_crews(module_attr: Any) -> list[Crew]:
+    """Collect all Crew instances reachable from a module attribute.
+
+    Resolves the attribute itself via `get_crew_instance`, and if it is a
+    Flow subclass, also inspects each of its instance attributes for
+    additional Crew instances.
+
+    Args:
+        module_attr: An attribute from a loaded module.
+
+    Returns:
+        A list of Crew instances found, empty if none were found.
+    """
     crew_instances: list[Crew] = []
 
     if crew_instance := get_crew_instance(module_attr):
