@@ -566,6 +566,13 @@ class Task(BaseModel):
 
     @property
     def key(self) -> str:
+        """Stable identifier for this task's identity.
+
+        Derived from the task's original (pre-interpolation) description
+        and expected output, so the key stays constant across runs even
+        after placeholders have been interpolated. Used for caching and
+        deduplication.
+        """
         description = self._original_description or self.description
         expected_output = self._original_expected_output or self.expected_output
         source = [description, expected_output]
