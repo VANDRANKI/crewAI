@@ -25,6 +25,13 @@ def _is_cursor_env() -> bool:
 
 
 def get_env_context() -> None:
+    """Emit an environment context event once per context.
+
+    Detects which coding environment (Claude Code, Codex, Cursor, or
+    default) the current process is running in and emits a matching
+    event on the crewai event bus. Subsequent calls within the same
+    context are no-ops, ensuring the event is only emitted once.
+    """
     if _env_context_emitted.get():
         return
     _env_context_emitted.set(True)
