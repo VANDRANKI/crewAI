@@ -80,7 +80,7 @@ def lock(name: str, *, timeout: float = _DEFAULT_TIMEOUT) -> Iterator[None]:
             raise portalocker.exceptions.LockException(
                 f"Failed to acquire lock '{name}' at {lock_path} "
                 f"(timeout={timeout}s). This commonly occurs in "
-                f"multi-process environments. "
+                f"multi-process environments."
             ) from exc
         try:
             yield
