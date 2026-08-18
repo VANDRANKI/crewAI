@@ -107,6 +107,19 @@ def to_serializable(
 
 
 def _to_serializable_key(key: Any) -> str:
+    """Converts a dict key into a JSON-compatible string key.
+
+    JSON object keys must be strings, so `str`/`int` keys are stringified
+    directly. Any other key type (e.g. tuples, enums, custom objects) is
+    encoded as `key_<id>_<repr>` to keep the result unique and JSON-safe
+    without silently colliding on `str(key)`.
+
+    Args:
+        key: The original dict key, of any type.
+
+    Returns:
+        A JSON-compatible string representation of the key.
+    """
     if isinstance(key, (str, int)):
         return str(key)
     return f"key_{id(key)}_{key!r}"
